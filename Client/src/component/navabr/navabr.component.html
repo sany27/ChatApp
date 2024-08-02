@@ -1,0 +1,31 @@
+<section class="container">
+    <nav class="navbar navbar-expand-lg bg-light">
+        <div class="container-fluid">
+          <a class="navbar-brand"routerLink=""  >Chat-App</a>
+          <button class="navbar-toggler " type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+              <li class="nav-item">
+                <a routerLink=""  class="nav-link active" aria-current="page">Home</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" routerLink="login" [hidden]="userLogin">login</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" routerLink="register" [hidden]="userLogin">register</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" routerLink="login" (click)="logout()" [hidden]="!userLogin">Logout</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+</section>
+
+
+
+
+

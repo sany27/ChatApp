@@ -1,0 +1,30 @@
+<section class="container">
+  <h1>Login</h1>
+  <form [formGroup] ="loginForm" (ngSubmit) = "onSubmit()" class="row g-3 needs-validation " novalidate >
+  <div class=" col-12">
+    <label  class="form-label">Email address</label>
+    <input type="email" class="form-control"  formControlName="email"  placeholder="name@example.com">
+    @if((isFormSubmitted || f['email'].touched || f['email'].dirty) && f['email'].invalid){ 
+      @if (f['email'].errors?.['required']) {
+  <div class="text-danger">
+      email is required
+  </div>
+  } }
+  </div>
+  
+  <div class="col-12">
+    <label  class="form-label">password</label>
+    <input type="password" class="form-control" formControlName="password" >
+    @if((isFormSubmitted || f['password'].touched || f['password'].dirty) && f['password'].invalid){ 
+      @if (f['password'].errors?.['required']) {
+  <div class="text-danger">
+      password is required
+  </div>
+  } }
+  </div>
+ <div><p>You don't have any account ? <a routerLink="register">Regsiter</a></p></div>
+  <div class="col-12">
+    <button class="btn btn-primary" type="submit">Login</button>
+  </div>
+  </form>
+</section>

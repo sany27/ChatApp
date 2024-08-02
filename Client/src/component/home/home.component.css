@@ -1,0 +1,114 @@
+#container {
+  max-height: 90vh;
+  width: 100%;
+  /* border: 2px solid red; */
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  margin: 10px auto;
+  padding: 10px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.user-container {
+  max-height: 80vh;
+  width: 40%;
+  padding: 10px 0px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-direction: column;
+  gap: 10px;
+  overflow: scroll;
+  overflow-x: hidden;
+}
+
+.user-card {
+  width: 100%;
+  padding: 10px;
+  height: 60px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  background-color: #e2e2e2;
+  cursor: pointer;
+}
+
+.user-card img {
+  height: 40px;
+  width: 40px;
+  border-radius: 50%;
+}
+
+.chat-container {
+  width: 60%;
+  height: 85vh;
+  border: 1px solid black;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.chat-header{
+    margin-top: 10px;
+    width: 100%;
+    /* border: 1px solid #000; */
+    height: 10%;
+}
+.user-img{
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+    font-weight: 800;
+}
+.user-img img{
+    width: 50px;
+    height: 50px;
+    margin-left: 10px;
+   
+   
+
+}
+.chat-body{
+    background-image: url('https://i.pinimg.com/564x/8c/98/99/8c98994518b575bfd8c949e91d20548b.jpg');
+    width: 100%;
+    max-height: 90%;
+    height: 90%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: flex-end;
+    overflow: scroll;
+    overflow-x: hidden;
+}
+.msg-body{
+  width: fit-content;
+    max-width: 60%;
+    word-break: break-all;
+    margin: 5px;
+    padding: 0 8px;
+    
+    border-radius: 12px;
+    margin-top: 10px;
+    background-color: rgb(164, 249, 164);
+    color: rgb(7, 7, 7);
+}
+.chat-footer{
+    width: 100%;
+    height: 10%;
+}
+.sent-msg{
+    width: 100%;
+    border: 1px solid black;
+}
+.sent-msg input{
+    width: 80%;
+}
+.sent-msg button{
+    width: 20%;
+}

@@ -1,0 +1,18 @@
+create api in node 
+1. signup
+2. login
+3. user listing
+4. save chat message api
+5. chat message listing api
+
+admin is default entry in database. use column user_type in users table in MYSQL
+
+In Angular 
+1. signup
+2. login
+3. chat screen
+
+Login Admin/User
+
+user listing will to only the admin. 
+and user can see only the chat screen.
