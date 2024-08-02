@@ -6,21 +6,23 @@
         <p>{{item.name}}</p>
       </div>
     }
-    
   </div>
-  <div class="chat-container">
+  <div class="chat-box" [hidden]="ischatOpen">
+    <h1>Your chats will appeared!</h1>
+  </div>
+  <div class="chat-container"  [hidden]="!ischatOpen" >
+
     <div class="chat-header">
       <div class="user-img">
         <img src="https://static.vecteezy.com/system/resources/thumbnails/020/765/399/small/default-profile-account-unknown-icon-black-silhouette-free-vector.jpg" alt="">
         <h6>{{name}}</h6>
       </div>
-
     </div>
     <div class="chat-body">
       @for (msg of messages; track msg) {
         <div class="msg-body">
-          <p> {{msg}}</p>
-          
+          <p> {{msg.message}}</p>
+
         </div>
       }
     </div>

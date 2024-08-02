@@ -16,8 +16,11 @@ export class HomeComponent implements OnInit {
   messages: any[] = [];
   message: any;
   currentUser: any;
-  name: any
-  id:any
+  name: any;
+  id: any;
+  ischatOpen: boolean = false;
+  recevierId: any = '';
+  sendermsg: boolean =true;
 
   constructor(
     private userService: ChatsService,
@@ -29,7 +32,6 @@ export class HomeComponent implements OnInit {
     this.userService.allUser().subscribe({
       next: (data: any) => {
         const admin_id = this.currentUser.user.id;
-
         this.user = data.users.filter((user: any) => user.IDs !== admin_id);
       },
     });
@@ -38,16 +40,32 @@ export class HomeComponent implements OnInit {
       console.log(this.messages);
     });
   }
-
   userSelected(data: any) {
+    this.recevierId = data.IDs;
 
-   this.id= this.currentUser.user.id;
-   this.name = data.name;
+    this.ischatOpen = true;
+    const joinRoomData = {
+      sender : this.currentUser.user.id,
+      reciever : data.IDs,
+    };
+
+    this.chatApp.joinRoom(joinRoomData);
+
+    this.id = this.currentUser.user.id;
+    this.name = data.name;
     this.chatApp.reciverfunc(data, this.id);
   }
 
   messageSend() {
-    this.chatApp.sendMessage(this.message);
+    console.log(this.currentUser);
+    const messagedata = {
+
+      sender : this.currentUser.user.id,
+      reciever : this.recevierId,
+      message : this.message,
+    };
+    this.chatApp.sendMessage(messagedata);
+    console.log(this.message);
     this.message = '';
   }
 }

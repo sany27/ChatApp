@@ -37,21 +37,28 @@ connection.connect(function (err) {
 io.on("connection", (socket) => {
   console.log("user connected");
   console.log("Socket Id: ", socket.id);
-  
-  socket.on("message", (data) => {
-    console.log(data);
-    io.emit("NewMessage", data);
-  });
-  socket.on("id", (data) => {
+// Join room
+  socket.on("joinRoom", (data) => {
     reciever_id = data.reciever;
     sender_id = data.sender;
-    console.log("Reciever id: ", reciever_id);
-    console.log("Sender id: ", sender_id);
-    const room  = [reciever_id, sender_id].sort().join('-');
-    io.to(room).emit("NewMessage", data);
-    console.log("room",room);
+    const room = [reciever_id, sender_id].sort().join('-');
+    socket.join(room);
+    const count = io.sockets.adapter.rooms.get(room).size;
+    console.log('usercount join room', count);
+
+    // Send msg
+    socket.on("message", (data) => {
+      console.log('send message room', room);
+      io.to(room).emit("NewMessage", data);
+    });
+
+    socket.on("userConnection", () => {
+      socket.join(room);
+      io.to(room).emit("room", room, () => {
+        console.log("Message emitted to room:", room);
+      });
+    });
   });
-  
   socket.on("disconnect", () => {
     console.log("User Disconnected");
   })
@@ -84,7 +91,6 @@ function verifyToken(req, res, next) {
     res.status(401).json({ error: 'Invalid token' });
   }
 };
-
 // Register User
 // Insert into the table
 app.post("/user", async (req, res) => {
@@ -113,7 +119,7 @@ app.post("/user", async (req, res) => {
       });
     });
 
-  } catch (err) { 
+  } catch (err) {
     console.log('error');
     res.status(500).json({
       status: false,
@@ -155,7 +161,7 @@ app.get("/user", verifyToken, (req, res) => {
       }
       else {
 
-        console.log(result);
+        // console.log(result);
         return res.status(202).json({
           success: true,
           users: result,
