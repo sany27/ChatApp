@@ -12,11 +12,12 @@
 
 .user-container {
   max-height: 80vh;
+  height: 80vh;
   width: 40%;
   padding: 10px 0px;
   display: flex;
-  align-items: center;
-  justify-content: flex-start;
+  /* align-items: center;
+  justify-content: flex-start; */
   flex-direction: column;
   gap: 10px;
   overflow: scroll;
@@ -106,8 +107,12 @@
 }
 .sent-msg{
     width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     border: 1px solid black;
 }
+
 .sent-msg input{
     width: 80%;
 }

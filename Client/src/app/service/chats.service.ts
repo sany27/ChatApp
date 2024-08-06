@@ -1,17 +1,28 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, of, retry } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { jwtDecode } from 'jwt-decode';
 @Injectable({
   providedIn: 'root',
 })
 export class ChatsService {
+  
   constructor(private httpClient: HttpClient) {}
-
   registerUser(data: any): Observable<any> {
-    return this.httpClient.post('http://localhost:8080/user', data);
+    return this.httpClient.post('http://localhost:8000/user', data);
   }
 
+  saveChat(data: any): Observable<any> {
+    return this.httpClient.post('http://localhost:8000/savechat',data);
+  }
+
+  getChat(data:any):Observable<any>{
+    const params = new HttpParams()
+    .set('sender_id', data.sender)
+    .set('reciever_id', data.reciever );
+    return this.httpClient.get('http://localhost:8000/chats',{params})
+  }
+  
   allUser(): Observable<any> {
     if (typeof localStorage !== 'undefined') {
       const token = localStorage.getItem('Token');
@@ -23,7 +34,7 @@ export class ChatsService {
           'Authorization',
           `Bearer ${token}`
         );
-        return this.httpClient.get('http://localhost:8080/user', { headers });
+        return this.httpClient.get('http://localhost:8000/user', { headers });
       } else {
         return of(null);
       }
@@ -59,7 +70,7 @@ export class ChatsService {
   // }
 
   loginUser(data: any): Observable<any> {
-    return this.httpClient.post('http://localhost:8080/login', data);
+    return this.httpClient.post('http://localhost:8000/login', data);
   }
 
   isAuthenticated() {

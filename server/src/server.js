@@ -19,7 +19,8 @@ app.use(cors());
 app.use(express.json());
 
 const mysql = require('mysql');
-const port = 8080;
+const { error } = require('console');
+const port = 8000;
 const connection = mysql.createConnection({
   host: 'localhost',
   user: 'root',
@@ -37,7 +38,7 @@ connection.connect(function (err) {
 io.on("connection", (socket) => {
   console.log("user connected");
   console.log("Socket Id: ", socket.id);
-// Join room
+  // Join room
   socket.on("joinRoom", (data) => {
     reciever_id = data.reciever;
     sender_id = data.sender;
@@ -48,10 +49,13 @@ io.on("connection", (socket) => {
 
     // Send msg
     socket.on("message", (data) => {
-      console.log('send message room', room);
-      io.to(room).emit("NewMessage", data);
+      reciever_id = data.reciever_id;
+      sender_id = data.sender_id_;
+      message = data.message;
+      const room = [ reciever_id , sender_id].sort().join('-');
+    
+      io.to(room).emit("NewMessage", message);
     });
-
     socket.on("userConnection", () => {
       socket.join(room);
       io.to(room).emit("room", room, () => {
@@ -63,7 +67,6 @@ io.on("connection", (socket) => {
     console.log("User Disconnected");
   })
 });
-
 function verifyToken(req, res, next) {
   const token = req.header('Authorization')?.replace('Bearer ', "");
   if (!token) {
@@ -71,7 +74,7 @@ function verifyToken(req, res, next) {
   }
   try {
     const decoded = jwt.verify(token, process.env.KEY);
-    const query = `select name,email,address,userType from registereduser where email = ?`;
+    const query = `select name,email,address,userType from user where email = ?`;
     connection.query(query, [decoded?.email], (err, results) => {
       if (err) {
         return res.status(200).json({
@@ -91,6 +94,43 @@ function verifyToken(req, res, next) {
     res.status(401).json({ error: 'Invalid token' });
   }
 };
+app.post("/savechat",(req,res)=>{
+  console.log(req.body);
+  const {sender_id_ , reciever_id, message} = req.body;
+  const room = [ reciever_id , sender_id_].sort().join('-');
+
+  const query = `Insert into user_chat (sender_id,reciever_id,message,room_id,created_at) values( ?,?,?,?,Now())`;
+  const value = [sender_id_, reciever_id, message, room];
+  connection.query(query, value, (err, result) => {
+    if (err) {
+      console.log(err);
+    }
+    else{
+      return result;
+    }
+  })
+});
+
+app.get("/chats",(req,res)=>{
+  // console.log("query", req.query);
+  const {sender_id,reciever_id} = req.query;
+  const room = [sender_id,reciever_id].sort().join('-');
+  const query = `select * from user_chat where room_id = ? `;
+  connection.query(query, room, (err,result)=>{
+    if(err){
+      console.log(err);
+    }
+    else{
+      // console.log("result",result);
+      return res.status(200).json({
+        success: true,
+        message: "Chat fetched",
+        data : result
+      })
+    }
+    
+  })
+})
 // Register User
 // Insert into the table
 app.post("/user", async (req, res) => {
@@ -104,7 +144,7 @@ app.post("/user", async (req, res) => {
       });
     }
     const encryptedPassword = await bcrypt.hash(password, salt);
-    const result = "INSERT INTO registereduser (name, email,password,address) VALUES (?,?,?,?)"
+    const result = "INSERT INTO user (name, email,password,address) VALUES (?,?,?,?)"
     const data = [name, email, encryptedPassword, address];
     connection.query(result, data, (err, results) => {
       if (err) {
@@ -118,7 +158,6 @@ app.post("/user", async (req, res) => {
         message: results
       });
     });
-
   } catch (err) {
     console.log('error');
     res.status(500).json({
@@ -127,11 +166,10 @@ app.post("/user", async (req, res) => {
     });
   }
 });
-
 app.patch("/user/:IDs", (req, res) => {
   const { IDs } = req.params;
   const { name, email, address, userType } = req.body;
-  const data = ` UPDATE registereduser set name = ?,email =?, address = ? ,userType = ? where Ids = ?`
+  const data = ` UPDATE user set name = ?,email =?, address = ? ,userType = ? where Ids = ?`
   const value = [name, email, address, password, userType, IDs]
 
   connection.query(data, value, (err, result) => {
@@ -145,56 +183,47 @@ app.patch("/user/:IDs", (req, res) => {
         message: result
       })
     }
-
   })
 })
-
 // read all the users from table
 app.get("/user", verifyToken, (req, res) => {
   try {
-
-    const data = `SELECT *  from registereduser`;
-
+    const data = `SELECT *  from user`;
     connection.query(data, function (err, result) {
       if (err) {
         console.log(err);
       }
       else {
-
-        // console.log(result);
         return res.status(202).json({
           success: true,
           users: result,
         });
       }
     });
-
   } catch (err) {
     res.status(500).json({
       message: err,
     });
   }
 });
+
 // get the user by name
 app.get("/user/:IDs", (req, res) => {
   try {
     const { IDs } = req.params;
-    const data = `Select  name, email,address,userType from registereduser where IDs = ?`
-
-
+    const data = `Select  name, email,address,userType from user where IDs = ?`
     connection.query(data, [IDs], (err, result) => {
       if (err) {
         console.log(err);
       }
       else {
-        console.log(result);
+        // console.log(result);
         return res.status(200).json({
           success: true,
           message: result
         })
       }
     })
-
   } catch (err) {
     res.status(400).json({
       status: false
@@ -203,11 +232,10 @@ app.get("/user/:IDs", (req, res) => {
 });
 
 // delete from the table
-
 app.delete("/user/:IDs", (req, res) => {
   try {
     const { IDs } = req.params;
-    const data = `DELETE FROM registereduser  where IDs = ?`;
+    const data = `DELETE FROM user  where IDs = ?`;
     connection.query(data, [IDs], (err, result) => {
       if (err) {
         console.log(err.message);
@@ -229,7 +257,6 @@ app.delete("/user/:IDs", (req, res) => {
 
 });
 // Login User
-
 app.post("/login", (req, res) => {
   try {
     const { email, password } = req.body;
@@ -240,18 +267,12 @@ app.post("/login", (req, res) => {
         message: 'All fields are required',
       });
     }
-
-    console.log(password)
-
-    const query = 'select * from registereduser where email = ? ';
-
+    const query = 'select * from user where email = ? ';
     connection.query(query, [email], (err, results) => {
       if (err) {
         console.log(err);
         return;
       }
-      console.log(results);
-
       if (results.length === 0) {
         return res.status(404).json({
           success: false,
@@ -259,8 +280,6 @@ app.post("/login", (req, res) => {
         });
       }
       const user = results[0];
-
-
       // compare password
       const comparison = bcrypt.compare(password, user.password)
       if (!comparison) {
@@ -275,19 +294,12 @@ app.post("/login", (req, res) => {
         email: user.email,
         address: user.address,
         userType: user.userType,
-
       }
-
       const token = jwt.sign(
         { user: user_info },
         process.env.KEY,
         { expiresIn: '1h' }
-
-
       )
-
-
-
       return res.status(200).json({
         success: true,
         message: 'Login successfull!',
@@ -302,15 +314,10 @@ app.post("/login", (req, res) => {
     })
   }
 })
-
-
-
 app.get("/", (req, res) => {
   console.log("Root is Working !")
   res.send("Working");
 });
-
-
 server.listen(port, () => {
   console.log("Server is listening to port", port);
 })

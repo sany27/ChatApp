@@ -8,20 +8,15 @@ import { io, Socket } from 'socket.io-client';
 export class ChatappService {
   sockets: Socket;
   constructor() {
-    this.sockets = io('http://localhost:8080');
+    this.sockets = io('http://localhost:8000');
   }
-
-
   joinRoom(data: any) {
-    console.log(data);
     this.sockets.emit('joinRoom', data);
   }
-
   sendMessage(data: any) {
     console.log(data);
     this.sockets.emit('message', data);
   }
-
   reciverfunc(data: any, id: any) {
     const reciever_id = data.IDs;
     const sender_id = id;
